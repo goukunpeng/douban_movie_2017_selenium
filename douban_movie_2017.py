@@ -64,7 +64,7 @@ class GetDoubanMovie2017(object):
         '''
         self.button_catalog.click()  # 点击目录
         # 找到目录标题的节点。每次点击目录后，获得标题的节点的值是不一样的。
-        time.sleep(0.2)
+        time.sleep(0.3)
         self.wait.until(EC.presence_of_all_elements_located)
         try:
             catalog_title_element = self.browser.find_elements(By.XPATH, '//nav[@data-scroll="free"]/ul/li/a')[i]
@@ -75,12 +75,11 @@ class GetDoubanMovie2017(object):
         info = {}
         if catalog_title_names[i][0:2] == "台词":
             movie_taici = self.browser.find_element(By.CLASS_NAME, '_3hnav').text
-            # movie_taici = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_3hnav'))).text
             movie_link = self.browser.find_element(By.XPATH, '//div[@class="_2MPhS"]/a').get_attribute('href')
             movie_name = self.browser.find_element(By.XPATH, '//div[@class="_2MPhS"]/a').text
             movie_info = {'name': movie_name, 'link': movie_link, 'taici': movie_taici}
             info['{}'.format(right_title_name)] = movie_info
-        if catalog_title_names[i][0:4] == "榜单电影":
+        elif catalog_title_names[i][0:4] == "榜单电影":
             movie_title = self.browser.find_elements(By.XPATH, '//li[@class="_3M3-l"]/a/p[@class="hBH2S"]')
             movie_link = self.browser.find_elements(By.XPATH, '//li[@class="_3M3-l"]/a')
             movie_info = {}
@@ -91,9 +90,10 @@ class GetDoubanMovie2017(object):
                 except IndexError as error:
                     movie_info['Error'] = {'IndexError': error.args}
             info['{}'.format(right_title_name)] = movie_info
-        if catalog_title_names[i][-2:] == "演员" \
+        elif catalog_title_names[i][-2:] == "演员" \
                 or catalog_title_names[i][-2:] == "导演" \
-                or catalog_title_names[i][-2:] == "艺人":    # 布尔或  x or y,若x非0，返回x，否则返回y
+                or catalog_title_names[i][-2:] == "艺人":
+            # 布尔或  x or y,若x非0，返回x，否则返回y
             self.wait.until(EC.presence_of_all_elements_located)
             current_title_elements = self.browser.find_elements(By.XPATH, '//div[@class="_2pL9Z"]/h1/div')
             current_title_names = [name.text for name in current_title_elements]
@@ -132,8 +132,7 @@ class GetDoubanMovie2017(object):
                         except IndexError as error:
                             movie_info['Error'] = {'{}: Top2 ~ Top10'.format(right_title_name): error.args}
                         info['{}'.format(right_title_name)] = movie_info
-                        # print(info)
-        if catalog_title_names[i][-2:] == "逝者" or catalog_title_names[i][4:6] == "逝世":
+        elif catalog_title_names[i][-2:] == "逝者" or catalog_title_names[i][4:6] == "逝世":
             names = [name.text for name in
                      self.browser.find_elements(By.XPATH, '//ul[@class="_2twXO"]/li/div[@class="_3lvtk"]/span[1]')]
             eng_names = [eng_name.text for eng_name in
@@ -151,20 +150,12 @@ class GetDoubanMovie2017(object):
             else:
                 info['{}'.format(right_title_name)] = {'names': len(names), 'eng_names': len(eng_names),
                                                        'links': len(links), 'staff_and_ages': len(staff_and_ages)}
-        if catalog_title_names[i] == "开篇" or catalog_title_names[i] == "结束页":
+        elif catalog_title_names[i] == "开篇" or catalog_title_names[i] == "结束页":
             pass
-        if catalog_title_names[i] == "留言板":
+        elif catalog_title_names[i] == "留言板":
             pass
-        if "台词" not in catalog_title_names[i]\
-                and "榜单电影" not in catalog_title_names[i]\
-                and "演员" not in catalog_title_names[i]\
-                and "导演" not in catalog_title_names[i]\
-                and "逝者" not in catalog_title_names[i]\
-                and "逝世" not in catalog_title_names[i]\
-                and "开篇" not in catalog_title_names[i]\
-                and "结束页" not in catalog_title_names[i]\
-                and "留言板" not in catalog_title_names[i]\
-                and "艺人" not in catalog_title_names[i]:   # 布尔与，x and y，x为false，返回false，否则返回y
+        # 布尔与，x and y，x为false，返回false，否则返回y
+        else:
             self.wait.until(EC.presence_of_all_elements_located)
             current_title_elements = self.browser.find_elements(By.XPATH, '//div[@class="_2pL9Z"]/h1/div')
             # 当前网页页面的目录标题名称
